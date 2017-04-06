@@ -1,0 +1,36 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+eclipse.classpath.file.whenMerged { 
+    def libs = entries.findAll { it.path.endsWith '.jar' }
+    libs.each {library ->
+	    library.exported = true    	
+    }
+}
+
+jar {
+    manifest {
+        from new File("${projectDir}/META-INF/MANIFEST.MF")
+    }
+}
+
+// Retrieve der benötigten JARs, damit der PDE-Build funktionieren kann.
+task(retrieveJars, type: Copy) {
+    from(getDependencies())
+    into("${project.projectDir}")
+}
+jar.dependsOn(retrieveJars)
+
+def getDependencies() {
+    
+    def projectDependencies = []
+            
+    projectDependencies.addAll(
+       project.configurations.runtime.filter({ File file ->
+           // 'sources' aussortieren
+           !file.name.endsWith("-sources.jar")
+       }).files
+    )
+            
+    return files(projectDependencies)
+}

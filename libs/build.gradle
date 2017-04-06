@@ -1,0 +1,7 @@
+apply plugin: 'java'
+
+dependencies {
+   runtime(group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.8.9') {transitive = false}
+}
+
+apply from: new File('client-libraries.gradle')
